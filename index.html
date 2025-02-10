@@ -1,0 +1,1772 @@
+<html>
+<head>
+  <base href="./">
+  <title>Henrique.IA</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: linear-gradient(135deg, #000000, #111111);
+      color: white;
+      font-family: Arial, sans-serif;
+      padding: 2rem;
+    }
+
+    .container {
+      max-width: 1200px;
+      width: 95%;
+      text-align: center;
+      padding: 10px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      margin-bottom: 2rem;
+      font-size: 2.5rem;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .input-group {
+      margin-bottom: 1.5rem;
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+      background: rgba(255,255,255,0.05);
+    }
+
+    input, select {
+      padding: 1rem;
+      font-size: 1rem;
+      border: none;
+      border-radius: 5px;
+      background: rgba(255,255,255,0.1);
+      color: white;
+    }
+
+    input {
+      width: 100%;
+      min-width: 200px;
+      max-width: 400px;
+    }
+
+    select {
+      width: 100%;
+      min-width: 120px;
+      max-width: 200px;
+      cursor: pointer;
+    }
+
+    select option {
+      background: #16213e;
+      color: white;
+    }
+
+    button {
+      padding: 0.8rem 1.5rem;
+      font-size: 0.9rem;
+      background: #4CAF50;
+      border: none;
+      border-radius: 5px;
+      color: white;
+      cursor: pointer;
+      transition: transform 0.2s;
+      white-space: nowrap;
+      min-width: 120px;
+    }
+
+    button:hover {
+      transform: scale(1.05);
+    }
+
+    .image-container {
+      margin: 1rem 0;
+      padding: 1rem;
+      background: rgba(255,255,255,0.08);
+      border-radius: 10px;
+      min-height: 200px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .loading {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #4CAF50;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .placeholder-text {
+      color: rgba(255,255,255,0.6);
+      font-size: 1.2rem;
+    }
+
+    .generated-image {
+      max-width: 100%;
+      max-height: 400px;
+      object-fit: contain;
+    }
+
+    .save-button {
+      margin-top: 1rem;
+      background: #2196F3;
+    }
+
+    .add-gallery-button {
+      margin-top: 1rem;
+      background: #9c27b0;
+      margin-left: 1rem;
+    }
+
+    .editor-controls {
+      margin-top: 1rem;
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      background: rgba(255,255,255,0.05);
+    }
+
+    .color-picker {
+      padding: 0.5rem;
+      background: rgba(255,255,255,0.1);
+      border: none;
+      border-radius: 5px;
+      width: 50px;
+      height: 50px;
+      cursor: pointer;
+      margin: 0 5px;
+      vertical-align: middle;
+    }
+
+    .color-display {
+      display: inline-flex;
+      align-items: center;
+      padding: 5px 10px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 5px;
+      margin-left: 10px;
+      flex-wrap: wrap;
+      width: 100%;
+      justify-content: center;
+    }
+
+    .color-preview {
+      width: 25px;
+      height: 25px;
+      border-radius: 50%;
+      border: 2px solid white;
+      margin-right: 8px;
+    }
+
+    .color-value {
+      color: white;
+      font-family: monospace;
+    }
+
+    .tool-group {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+      background: rgba(255,255,255,0.03);
+      padding: 8px;
+      border-radius: 8px;
+      flex-wrap: wrap;
+    }
+
+    .tool-button {
+      padding: 0.6rem;
+      background: #2196F3;
+      border: none;
+      border-radius: 5px;
+      color: white;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .tool-button svg {
+      width: 24px;
+      height: 24px;
+      fill: currentColor;
+    }
+
+    .tool-button:hover {
+      background: #1976D2;
+      transform: translateY(-1px);
+    }
+
+    .tool-button.active {
+      background: #1565C0;
+      box-shadow: 0 0 10px rgba(25,118,210,0.4);
+    }
+
+    .tool-button:hover::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 4px 8px;
+      background: rgba(0,0,0,0.8);
+      color: white;
+      border-radius: 4px;
+      font-size: 12px;
+      white-space: nowrap;
+      pointer-events: none;
+      margin-bottom: 5px;
+    }
+
+    .tool-button:hover::before {
+      content: '';
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      border: 5px solid transparent;
+      border-top-color: rgba(0,0,0,0.8);
+      margin-bottom: -5px;
+    }
+
+    canvas {
+      max-width: 100%;
+      max-height: 400px;
+      object-fit: contain;
+      display: none;
+    }
+
+    canvas.magic-wand {
+      cursor: crosshair;
+    }
+
+    .fill-image-prompt {
+      width: 100%;
+      margin-top: 1rem;
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 0.8rem;
+      width: 100%;
+      padding: 1rem;
+    }
+
+    .gallery-item {
+      padding: 0.8rem;
+      background: rgba(255,255,255,0.08);
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .gallery-item-image {
+      width: 100%;
+      height: 150px;
+      border-radius: 4px;
+      cursor: pointer;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+
+    .gallery-item .metadata {
+      font-size: 0.9rem;
+      color: rgba(255,255,255,0.8);
+    }
+
+    .gallery-item .stats {
+      display: flex;
+      gap: 1rem;
+      font-size: 0.8rem;
+      color: rgba(255,255,255,0.6);
+    }
+
+    .gallery-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      background: rgba(255,255,255,0.05);
+    }
+
+    .search-container {
+      position: relative;
+      flex: 1;
+      max-width: 400px;
+      min-width: 200px;
+    }
+
+    .search-container input {
+      width: 100%;
+      padding: 0.8rem;
+      padding-left: 2.5rem;
+      font-size: 0.9rem;
+      background: rgba(255,255,255,0.1);
+      border: none;
+      border-radius: 5px;
+      color: white;
+    }
+
+    .search-container input::placeholder {
+      color: rgba(255,255,255,0.6);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 0.8rem;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 1.2rem;
+      height: 1.2rem;
+      fill: rgba(255,255,255,0.6);
+      pointer-events: none;
+    }
+
+    .no-results {
+      text-align: center;
+      padding: 2rem;
+      color: rgba(255,255,255,0.6);
+      font-size: 1.1rem;
+      grid-column: 1 / -1;
+    }
+
+    .text-preview {
+      position: fixed;  
+      pointer-events: none;
+      white-space: nowrap;
+      transform-origin: left top;
+      z-index: 1001;
+    }
+
+    .text-controls {
+      position: fixed;
+      background: rgba(0,0,0,0.9);
+      padding: 12px;
+      border-radius: 8px;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+      margin-top: 30px; 
+      max-width: 300px; 
+    }
+
+    .text-controls input[type="text"] {
+      width: 100%;
+      padding: 6px;
+      border: none;
+      border-radius: 4px;
+    }
+
+    .text-options {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      flex-wrap: wrap; 
+    }
+
+    .text-options select,
+    .text-options input {
+      padding: 4px;
+      border: none;
+      border-radius: 4px;
+      min-width: 0; 
+    }
+
+    .text-options input[type="number"] {
+      width: 50px;
+    }
+
+    .editor-section {
+      margin-bottom: 2rem;
+      padding: 1.5rem;
+      background: rgba(255,255,255,0.02);
+      border-radius: 8px;
+    }
+
+    .gallery-pagination {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 1rem;
+      margin: 2rem 0;
+      padding: 1rem;
+      background: rgba(255,255,255,0.05);
+      border-radius: 8px;
+    }
+
+    .pagination-button {
+      background: #2196F3;
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 4px;
+      color: white;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .pagination-button:hover {
+      background: #1976D2;
+    }
+
+    .pagination-button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+
+    #pageInfo {
+      font-size: 0.9rem;
+      color: rgba(255,255,255,0.8);
+    }
+
+    #editTitleDialog {
+      padding: 15px;
+      max-width: 300px;
+    }
+
+    .username-link {
+      color: #2196F3;
+      cursor: pointer;
+      text-decoration: underline;
+      transition: color 0.2s;
+    }
+
+    .username-link:hover {
+      color: #1976D2;
+    }
+
+    #userFilterInfo {
+      background: rgba(255,255,255,0.08);
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      margin-bottom: 1rem;
+    }
+
+    .clear-filter-button {
+      background: #f44336;
+      padding: 0.3rem 0.8rem;
+      font-size: 0.8rem;
+      min-width: auto;
+    }
+
+    .clear-filter-button:hover {
+      background: #d32f2f;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Henrique.IA</h1>
+    
+    <div class="editor-section">
+      <div class="input-group">
+        <select id="prefixPrompt">
+          <option value="">Selecionar Prefixo...</option>
+          <option value="HD ">HD</option>
+          <option value="4K ">4K</option>
+          <option value="Cartoon style ">Cartoon</option>
+          <option value="Realistic ">Realista</option>
+          <option value="Photorealistic ">Fotorrealista</option>
+          <option value="Black and white ">Preto e Branco</option>
+          <option value="Vintage ">Vintage</option>
+          <option value="Anime style ">Anime</option>
+        </select>
+        <input type="text" id="promptInput" placeholder="Digite sua descrição de imagem aqui...">
+        <select id="suffixPrompt">
+          <option value="">Selecionar Sufixo...</option>
+          <option value=", white background">Fundo Branco</option>
+          <option value=", black background">Fundo Preto</option>
+          <option value=", green background">Fundo Verde</option>
+          <option value=", blue background">Fundo Azul</option>
+          <option value=", high quality">Alta Qualidade</option>
+          <option value=", detailed">Detalhado</option>
+          <option value=", 8K">8K</option>
+          <option value=", professional lighting">Iluminação Profissional</option>
+        </select>
+        <button onclick="generateImage()">Gerar</button>
+        <input type="file" id="imageUpload" accept="image/*" onchange="handleImageUpload(event)" style="display:none">
+        <button onclick="document.getElementById('imageUpload').click()">Carregar Imagem</button>
+      </div>
+
+      <div class="image-container" id="imageContainer">
+        <div id="loadingSpinner" class="loading" style="display: none;"></div>
+        <div id="placeholderText" class="placeholder-text">Digite uma descrição para gerar uma imagem ou carregue uma do seu dispositivo</div>
+        <canvas id="editCanvas"></canvas>
+        <div class="editor-controls" id="editorControls">
+          <div class="tool-group">
+            <button class="tool-button" onclick="setTool('magicWand')" id="magicWandTool" data-tooltip="Varinha Mágica">
+              <svg viewBox="0 0 24 24">
+                <path d="M7,5L3,9L9,15L13,11L7,5M16,12L12,16L14,18L18,14L16,12M12.8,2.6L16,5.8L18.6,3.2L15.4,0L12.8,2.6M21.4,11.6L24,14.2L21.4,16.8L18.8,14.2L21.4,11.6M0,18L3,21L5.6,18.4L2.6,15.4L0,18Z"/>
+              </svg>
+            </button>
+            
+            <button class="tool-button" onclick="setTool('fillSelection')" id="fillSelectionTool" data-tooltip="Preencher Seleção">
+              <svg viewBox="0 0 24 24">
+                <path d="M19,11.5C19,11.5 17,13.67 17,15A2,2 0 0,0 19,17A2,2 0 0,0 21,15C21,13.67 19,11.5 19,11.5M5.21,10L10,5.21L14.79,10M16.56,8.94L7.62,0L6.21,1.41L8.59,3.79L3.44,8.94C2.85,9.5 2.85,10.47 3.44,11.06L8.94,16.56C9.23,16.85 9.62,17 10,17C10.38,17 10.77,16.85 11.06,16.56L16.56,11.06C17.15,10.47 17.15,9.5 16.56,8.94Z"/>
+              </svg>
+            </button>
+
+            <button class="tool-button" onclick="setTool('setAlpha')" id="setAlphaTool" data-tooltip="Definir Transparência">
+              <svg viewBox="0 0 24 24">
+                <path d="M17.66,8L12,2.35L6.34,8C4.78,9.56 4.78,12.11 6.34,13.66L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M13.96,12.29L11.21,15.83L9.25,13.47L6.5,17H17.5L13.96,12.29Z"/>
+              </svg>
+            </button>
+
+            <button class="tool-button" onclick="setTool('fillWithImage')" id="fillWithImageTool" data-tooltip="Preencher com Imagem Gerada">
+              <svg viewBox="0 0 24 24">
+                <path d="M19,19H5V5H19M19,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3M13.96,12.29L11.21,15.83L9.25,13.47L6.5,17H17.5L13.96,12.29M21.4,11.6L24,14.2L21.4,16.8L18.8,14.2L21.4,11.6M0,18L3,21L5.6,18.4L2.6,15.4L0,18Z"/>
+              </svg>
+            </button>
+
+            <button class="tool-button" onclick="clearSelection()" id="clearSelectionTool" data-tooltip="Limpar Seleção">
+              <svg viewBox="0 0 24 24">
+                <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+              </svg>
+            </button>
+
+            <button class="tool-button" onclick="setTool('text')" id="textTool" data-tooltip="Adicionar Texto">
+              <svg viewBox="0 0 24 24">
+                <path d="M18.5,4L19.66,8.35L18.7,8.61C18.25,7.74 17.79,6.87 17.26,6.43C16.73,6 16.11,6 15.5,6H13V16.5C13,17 13,17.5 13.33,17.75C13.67,18 14.33,18 15,18V19H9V18C9.67,18 10.33,18 10.67,17.75C11,17.5 11,17 11,16.5V6H8.5C7.89,6 7.27,6 6.74,6.43C6.21,6.87 5.75,7.74 5.3,8.61L4.34,8.35L5.5,4H18.5Z"/>
+              </svg>
+            </button>
+
+            <div class="color-display">
+              <div class="color-preview" id="colorPreview"></div>
+              <input type="color" id="colorPicker" class="color-picker" value="#ffffff">
+              <span class="color-value" id="colorValue">#FFFFFF</span>
+            </div>
+          </div>
+          
+          <div class="fill-image-prompt" id="fillImagePrompt" style="display: none;">
+            <input type="text" id="selectionPromptInput" placeholder="Digite a descrição para a região selecionada...">
+            <button onclick="generateSelectionFill()">Preencher com Imagem</button>
+          </div>
+          
+          <button onclick="resetImage()">Resetar Imagem</button>
+        </div>
+      </div>
+
+      <div class="action-buttons">
+        <button onclick="saveImage()" class="save-button" id="saveButton">Salvar Imagem</button>
+        <button onclick="addToGallery()" class="add-gallery-button" id="addGalleryButton">Adicionar à Galeria</button>
+      </div>
+    </div>
+
+    <div id="textControls" class="text-controls" style="display: none;">
+      <input type="text" id="textInput" placeholder="Digite o texto...">
+      <div class="text-options">
+        <select id="fontFamily">
+          <option value="Arial">Arial</option>
+          <option value="Times New Roman">Times New Roman</option>
+          <option value="Courier New">Courier New</option>
+          <option value="Georgia">Georgia</option>
+          <option value="Verdana">Verdana</option>
+        </select>
+        <input type="number" id="fontSize" value="24" min="8" max="72">
+        <input type="color" id="textColor" value="#000000">
+        <button onclick="commitText()">Aplicar</button>
+        <button onclick="cancelText()">Cancelar</button>
+      </div>
+    </div>
+
+    <div class="gallery-container">
+      <div class="gallery-header">
+        <div class="gallery-tabs">
+          <button class="gallery-tab active" onclick="showGalleryTab('recent')">Recentes</button>
+          <button class="gallery-tab" onclick="showGalleryTab('popular')">Populares</button>
+          <button class="gallery-tab" onclick="showGalleryTab('my')">Minhas Imagens</button>
+        </div>
+        <div id="userFilterInfo" style="display: none; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+          <span>Mostrando imagens de: <strong id="userFilterName"></strong></span>
+          <button onclick="clearUserFilter()" class="clear-filter-button">Limpar Filtro</button>
+        </div>
+        <div class="search-container">
+          <input type="text" id="gallerySearch" placeholder="Buscar imagens por título ou usuário..." onkeyup="filterGallery()">
+          <svg class="search-icon" viewBox="0 0 24 24">
+            <path d="M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M13.96,12.29L11.21,15.83L9.25,13.47L6.5,17H17.5L13.96,12.29Z"/>
+          </svg>
+        </div>
+      </div>
+      <div id="gallery" class="gallery"></div>
+      <div class="gallery-pagination" id="galleryPagination">
+        <button onclick="changePage(-1)" class="pagination-button" id="prevPage">Anterior</button>
+        <span id="pageInfo">Página 1 de 1</span>
+        <button onclick="changePage(1)" class="pagination-button" id="nextPage">Próxima</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="editTitleDialog" style="display: none;">
+    <div class="dialog-content">
+      <h3>Editar Título da Imagem</h3>
+      <input type="text" id="editTitleInput" placeholder="Digite o novo título">
+      <div class="dialog-buttons">
+        <button onclick="cancelTitleEdit()">Cancelar</button>
+        <button onclick="saveTitleEdit()">Salvar</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let room;
+    let galleryImages = [];
+    let currentTab = 'recent';
+    let currentPage = 1;
+    let itemsPerPage = 10;
+    let currentEditId = null;
+    let currentSearch = '';
+    let currentImage = null;
+    let originalImageData = null;
+    let currentSelection = null;
+    let isShiftPressed = false;
+    let isCtrlPressed = false;
+    let selectionCanvas = null;
+    let selectionCtx = null;
+    let currentTextPosition = null;
+    let textPreview = null;
+    let currentUserFilter = null;
+
+    async function initGallery() {
+      galleryImages = await room.collection('gallery_images').getList();
+      room.collection('gallery_images').subscribe(images => {
+        galleryImages = images;
+        renderGallery();
+      });
+      renderGallery();
+    }
+
+    function renderGallery() {
+      const galleryEl = document.getElementById('gallery');
+      let images = [...galleryImages];
+      
+      if (currentUserFilter) {
+        images = images.filter(img => {
+          const isCreator = img.username === currentUserFilter;
+          const hasModifications = img.promptHistory?.some(entry => 
+            entry.username === currentUserFilter
+          );
+          return isCreator || hasModifications;
+        });
+      } else if (currentSearch) {
+        const searchLower = currentSearch.toLowerCase();
+        images = images.filter(img => 
+          img.prompt.toLowerCase().includes(searchLower) || 
+          img.username.toLowerCase().includes(searchLower)
+        );
+      }
+
+      if (currentUserFilter) {
+        document.getElementById('userFilterInfo').style.display = 'flex';
+        document.getElementById('userFilterName').textContent = currentUserFilter;
+      } else {
+        document.getElementById('userFilterInfo').style.display = 'none';
+      }
+
+      switch (currentTab) {
+        case 'popular':
+          images.sort((a, b) => (b.views || 0) - (a.views || 0));
+          break;
+        case 'my':
+          images = images.filter(img => {
+            const isOriginalCreator = img.username === room.party.client.username;
+            const hasModifications = img.promptHistory?.some(entry => 
+              entry.username === room.party.client.username && 
+              entry.timestamp !== img.created_at
+            );
+            return isOriginalCreator || hasModifications;
+          });
+          break;
+        default:
+          images.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+      }
+
+      const start = (currentPage - 1) * itemsPerPage;
+      const end = start + itemsPerPage;
+      const paginatedImages = images.slice(start, end);
+
+      if (paginatedImages.length === 0) {
+        galleryEl.innerHTML = `
+          <div class="no-results">
+            ${currentUserFilter ? 'No images found by this user' : currentSearch ? 'No images found matching your search' : 'No images available'}
+          </div>
+        `;
+        document.getElementById('prevPage').disabled = true;
+        document.getElementById('nextPage').disabled = true;
+        document.getElementById('pageInfo').textContent = `Page ${currentPage} of ${Math.ceil(images.length / itemsPerPage)}`;
+        return;
+      }
+
+      galleryEl.innerHTML = paginatedImages.map(img => `
+        <div class="gallery-item">
+          <div 
+            class="gallery-item-image" 
+            style="background-image: url('${img.imageUrl}')"
+            onclick="loadGalleryImage('${img.id}')"
+            role="img" 
+            aria-label="${img.prompt}"
+          ></div>
+          <div class="metadata">
+            <div class="image-title" ${img.username === room.party.client.username ? 'onclick="editTitle(\'' + img.id + '\')"' : ''}>
+              ${img.title || img.prompt}
+              ${img.username === room.party.client.username ? '<span class="edit-icon">✎</span>' : ''}
+            </div>
+            <div>${img.modified ? '(Remix)' : ''}</div>
+            <div class="prompt-history">
+              ${renderPromptHistory(img)}
+            </div>
+            <div>by ${img.username}</div>
+            <div>${new Date(img.created_at).toLocaleDateString()}</div>
+          </div>
+          <div class="stats">
+            <span>${img.views || 0} views</span>
+            <span>${img.uses || 0} uses</span>
+          </div>
+          ${img.username === room.party.client.username ? `
+            <div class="gallery-item-controls">
+              <button class="edit-button" onclick="editImage('${img.id}')" title="Edit Image">
+                <svg viewBox="0 0 24 24">
+                  <path d="M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z"/>
+                </svg>
+              </button>
+              <button class="delete-button" onclick="deleteImage('${img.id}')" title="Delete Image">
+                <svg viewBox="0 0 24 24">
+                  <path d="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z"/>
+                </svg>
+              </button>
+            </div>
+          ` : ''}
+        </div>
+      `).join('');
+      
+      document.getElementById('prevPage').disabled = currentPage === 1;
+      document.getElementById('nextPage').disabled = currentPage === Math.ceil(images.length / itemsPerPage);
+      document.getElementById('pageInfo').textContent = `Page ${currentPage} of ${Math.ceil(images.length / itemsPerPage)}`;
+    }
+
+    async function showGalleryTab(tab) {
+      currentTab = tab;
+      document.querySelectorAll('.gallery-tab').forEach(el => {
+        el.classList.toggle('active', el.textContent.toLowerCase().includes(tab));
+      });
+      renderGallery();
+    }
+
+    function changePage(delta) {
+      currentPage += delta;
+      renderGallery();
+    }
+
+    async function loadGalleryImage(id) {
+      const image = galleryImages.find(img => img.id === id);
+      if (!image) return;
+      
+      await room.collection('gallery_images').update(id, {
+        views: (image.views || 0) + 1,
+        uses: (image.uses || 0) + 1
+      });
+      
+      const imageContainer = document.getElementById('imageContainer');
+      const existingImages = imageContainer.querySelectorAll('img');
+      existingImages.forEach(img => img.remove());
+      
+      const generatedImage = document.createElement('img');
+      generatedImage.id = `generatedImage_${Date.now()}`;
+      generatedImage.className = 'generated-image';
+      generatedImage.style.display = 'none';
+      generatedImage.crossOrigin = 'anonymous';
+      generatedImage.src = image.imageUrl;
+      generatedImage.alt = image.prompt;
+      
+      imageContainer.appendChild(generatedImage);
+      currentImage = generatedImage;
+      document.getElementById('saveButton').style.display = 'block';
+      document.getElementById('addGalleryButton').style.display = 'block';
+      
+      currentImage.onload = function () {
+        setupImageEditor();
+      };
+    }
+
+    function setupImageEditor() {
+      const canvas = document.getElementById('editCanvas');
+      const ctx = canvas.getContext('2d');
+      const editorControls = document.getElementById('editorControls');
+      const fillImagePrompt = document.getElementById('fillImagePrompt');
+      const loadingSpinner = document.getElementById('loadingSpinner');
+      const placeholderText = document.getElementById('placeholderText');
+      loadingSpinner.style.display = 'none';
+      placeholderText.style.display = 'none';
+      if (currentImage) {
+        canvas.width = currentImage.naturalWidth;
+        canvas.height = currentImage.naturalHeight;
+        ctx.drawImage(currentImage, 0, 0);
+        originalImageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        currentImage.style.display = 'none';
+        canvas.style.display = 'block';
+        editorControls.style.display = 'flex';
+      } else {
+        canvas.style.display = 'none';
+        editorControls.style.display = 'flex';
+      }
+      fillImagePrompt.style.display = 'none';
+      if (!canvas.hasEventListener) {
+        canvas.addEventListener('click', handleCanvasClick);
+        canvas.hasEventListener = true;
+      }
+    }
+
+    function handleCanvasClick(e) {
+      const canvas = document.getElementById('editCanvas');
+      const rect = canvas.getBoundingClientRect();
+      const x = (e.clientX - rect.left) * (canvas.width / rect.width);
+      const y = (e.clientY - rect.top) * (canvas.height / rect.height);
+
+      const activeTool = document.querySelector('.tool-button.active');
+      if (activeTool && activeTool.id === 'textTool') {
+        handleTextTool(e.clientX, e.clientY, x, y);
+        return;
+      }
+
+      if (!isShiftPressed && !isCtrlPressed) {
+        currentSelection = null;
+      }
+      const imageData = canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height);
+      const newSelection = magicWandSelect(imageData, Math.round(x), Math.round(y), 32);
+      if (isShiftPressed || isCtrlPressed) {
+        if (currentSelection) {
+          for (let i = 0; i < currentSelection.length; i++) {
+            currentSelection[i] = currentSelection[i] || newSelection[i];
+          }
+        } else {
+          currentSelection = newSelection;
+        }
+      } else {
+        currentSelection = newSelection;
+      }
+      drawSelectionOverlay();
+    }
+
+    function magicWandSelect(imageData, startX, startY, tolerance) {
+      const width = imageData.width;
+      const height = imageData.height;
+      const pixels = imageData.data;
+      const visited = new Uint8Array(width * height);
+      const selected = new Uint8Array(width * height);
+      const startPos = (startY * width + startX) * 4;
+      const startR = pixels[startPos];
+      const startG = pixels[startPos + 1];
+      const startB = pixels[startPos + 2];
+      const stack = [[startX, startY]];
+      while (stack.length) {
+        const [x, y] = stack.pop();
+        const pos = y * width + x;
+        if (x < 0 || x >= width || y < 0 || y >= height || visited[pos]) {
+          continue;
+        }
+        const pixelPos = pos * 4;
+        const r = pixels[pixelPos];
+        const g = pixels[pixelPos + 1];
+        const b = pixels[pixelPos + 2];
+        const colorDiff = Math.sqrt(Math.pow(r - startR, 2) + Math.pow(g - startG, 2) + Math.pow(b - startB, 2));
+        if (colorDiff <= tolerance) {
+          visited[pos] = 1;
+          selected[pos] = 1;
+          stack.push([x + 1, y], [x - 1, y], [x, y + 1], [x, y - 1]);
+        }
+      }
+      return selected;
+    }
+
+    function drawSelectionOverlay() {
+      const canvas = document.getElementById('editCanvas');
+      const ctx = canvas.getContext('2d');
+      ctx.putImageData(originalImageData, 0, 0);
+      if (!currentSelection) return;
+      const width = canvas.width;
+      const height = canvas.height;
+      ctx.strokeStyle = 'white';
+      ctx.lineWidth = 2;
+      for (let y = 0; y < height; y++) {
+        for (let x = 0; x < width; x++) {
+          const pos = y * width + x;
+          if (currentSelection[pos]) {
+            const isEdge = x > 0 && !currentSelection[pos - 1] || x < width - 1 && !currentSelection[pos + 1] || y > 0 && !currentSelection[pos - width] || y < height - 1 && !currentSelection[pos + width];
+            if (isEdge) {
+              ctx.fillStyle = 'white';
+              ctx.fillRect(x - 1, y - 1, 3, 3);
+              ctx.strokeStyle = 'black';
+              ctx.strokeRect(x - 1, y - 1, 3, 3);
+            }
+          }
+        }
+      }
+    }
+
+    function setTool(tool) {
+      const canvas = document.getElementById('editCanvas');
+      const fillImagePrompt = document.getElementById('fillImagePrompt');
+      const textControls = document.getElementById('textControls');
+      
+      document.querySelectorAll('.tool-button').forEach(btn => btn.classList.remove('active'));
+      
+      const toolButton = document.getElementById(`${tool}Tool`);
+      if (toolButton) {
+        toolButton.classList.add('active');
+      }
+
+      if (tool === 'fillSelection' && currentSelection) {
+        fillImagePrompt.style.display = 'none';
+        fillSelection();
+      } else if (tool === 'setAlpha' && currentSelection) {
+        fillImagePrompt.style.display = 'none';
+        setSelectionAlpha();
+      } else if (tool === 'fillWithImage' && currentSelection) {
+        fillImagePrompt.style.display = 'flex';
+      } else if (tool === 'text') {
+        canvas.style.cursor = 'text';
+      } else {
+        fillImagePrompt.style.display = 'none';
+        textControls.style.display = 'none';
+        canvas.style.cursor = tool === 'magicWand' ? 'crosshair' : 'default';
+      }
+    }
+
+    function fillSelection() {
+      if (!currentSelection) return;
+      const canvas = document.getElementById('editCanvas');
+      const ctx = canvas.getContext('2d');
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const pixels = imageData.data;
+      const color = document.getElementById('colorPicker').value;
+      const r = parseInt(color.substr(1, 2), 16);
+      const g = parseInt(color.substr(3, 2), 16);
+      const b = parseInt(color.substr(5, 2), 16);
+      for (let i = 0; i < currentSelection.length; i++) {
+        if (currentSelection[i]) {
+          const pixelPos = i * 4;
+          pixels[pixelPos] = r;
+          pixels[pixelPos + 1] = g;
+          pixels[pixelPos + 2] = b;
+        }
+      }
+      ctx.putImageData(imageData, 0, 0);
+      originalImageData = imageData;
+    }
+
+    function setSelectionAlpha() {
+      if (!currentSelection) return;
+      const canvas = document.getElementById('editCanvas');
+      const ctx = canvas.getContext('2d');
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const pixels = imageData.data;
+      for (let i = 0; i < currentSelection.length; i++) {
+        if (currentSelection[i]) {
+          const pixelPos = i * 4;
+          pixels[pixelPos + 3] = 0;
+        }
+      }
+      ctx.putImageData(imageData, 0, 0);
+      originalImageData = imageData;
+    }
+
+    function clearSelection() {
+      currentSelection = null;
+      const canvas = document.getElementById('editCanvas');
+      const ctx = canvas.getContext('2d');
+      ctx.putImageData(originalImageData, 0, 0);
+    }
+
+    function resetImage() {
+      const canvas = document.getElementById('editCanvas');
+      const ctx = canvas.getContext('2d');
+      ctx.putImageData(originalImageData, 0, 0);
+      currentSelection = null;
+    }
+
+    function saveImage() {
+      const canvas = document.getElementById('editCanvas');
+      const link = document.createElement('a');
+      link.download = 'edited-image.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    }
+
+    async function addToGallery() {
+      const canvas = document.getElementById('editCanvas');
+      const promptInput = document.getElementById('promptInput');
+      const prefixSelect = document.getElementById('prefixPrompt');
+      const suffixSelect = document.getElementById('suffixPrompt');
+      const fullPrompt = `${prefixSelect.value}${promptInput.value.trim()}${suffixSelect.value}`;
+      
+      try {
+        const sourceImage = galleryImages.find(img => 
+          img.imageUrl === currentImage.src
+        );
+        
+        if (sourceImage) {
+          await room.collection('gallery_images').update(sourceImage.id, {
+            uses: (sourceImage.uses || 0) + 1,
+            views: (sourceImage.views || 0) + 1
+          });
+        }
+        
+        const promptHistory = sourceImage ? 
+          [...(sourceImage.promptHistory || [{
+            prompt: sourceImage.prompt,
+            timestamp: sourceImage.created_at,
+            username: sourceImage.username
+          }])] : [];
+        
+        promptHistory.push({
+          prompt: fullPrompt,
+          timestamp: new Date().toISOString(),
+          username: room.party.client.username
+        });
+        
+        const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+        const file = new File([blob], 'edited-image.png', { type: 'image/png' });
+        const imageUrl = await websim.upload(file);
+        
+        await room.collection('gallery_images').create({
+          prompt: fullPrompt,
+          title: fullPrompt,
+          imageUrl: imageUrl,
+          views: 0,
+          uses: 0,
+          modified: true,
+          promptHistory: promptHistory,
+          sourceImageId: sourceImage?.id
+        });
+        
+        alert('Image added to gallery successfully!');
+        
+      } catch (error) {
+        console.error('Error adding to gallery:', error);
+        alert('Failed to add image to gallery. Please try again.');
+      }
+    }
+
+    function generateImage() {
+      const prefixSelect = document.getElementById('prefixPrompt');
+      const promptInput = document.getElementById('promptInput');
+      const suffixSelect = document.getElementById('suffixPrompt');
+      const fullPrompt = `${prefixSelect.value}${promptInput.value.trim()}${suffixSelect.value}`;
+
+      const imageContainer = document.getElementById('imageContainer');
+      const loadingSpinner = document.getElementById('loadingSpinner');
+      const placeholderText = document.getElementById('placeholderText');
+      const saveButton = document.getElementById('saveButton');
+      const addGalleryButton = document.getElementById('addGalleryButton');
+
+      if (!promptInput.value.trim()) {
+        alert('Please enter a prompt!');
+        return;
+      }
+
+      loadingSpinner.style.display = 'block';
+      placeholderText.style.display = 'none';
+      saveButton.style.display = 'none';
+      addGalleryButton.style.display = 'none';
+
+      const existingImages = imageContainer.querySelectorAll('img');
+      existingImages.forEach(img => img.remove());
+
+      const generatedImage = document.createElement('img');
+      generatedImage.id = `generatedImage_${Date.now()}`;
+      generatedImage.className = 'generated-image';
+      generatedImage.style.display = 'none';
+      generatedImage.crossOrigin = 'anonymous';
+      
+      // Set a flag to track if this is a fresh generation
+      generatedImage.dataset.freshGeneration = 'true';
+      
+      generatedImage.src = fullPrompt;
+      generatedImage.alt = fullPrompt;
+
+      generatedImage.onload = async function() {
+        // Check if this is a fresh generation and hasn't been processed yet
+        if (generatedImage.dataset.freshGeneration === 'true') {
+          // Immediately mark as processed to prevent duplicate processing
+          generatedImage.dataset.freshGeneration = 'false';
+          
+          loadingSpinner.style.display = 'none';
+          generatedImage.style.display = 'block';
+          placeholderText.style.display = 'none';
+          saveButton.style.display = 'block';
+          addGalleryButton.style.display = 'block';
+          currentImage = generatedImage;
+          
+          try {
+            // Create new gallery entry for the generated image
+            const galleryEntry = await room.collection('gallery_images').create({
+              prompt: fullPrompt,
+              imageUrl: generatedImage.src, 
+              views: 0,
+              uses: 0,
+              promptHistory: [{
+                prompt: fullPrompt,
+                timestamp: new Date().toISOString(),
+                username: room.party.client.username
+              }]
+            });
+            
+            // Store the gallery entry ID on the image element
+            generatedImage.dataset.galleryId = galleryEntry.id;
+            
+            setupImageEditor();
+            
+          } catch (error) {
+            console.error('Error processing generated image:', error);
+            alert('Failed to process generated image. Please try again.');
+          }
+        }
+      };
+
+      imageContainer.appendChild(generatedImage);
+    }
+
+    async function handleImageUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      
+      if (!file.type.startsWith('image/')) {
+        alert('Please select an image file');
+        return;
+      }
+      
+      const imageContainer = document.getElementById('imageContainer');
+      const loadingSpinner = document.getElementById('loadingSpinner');
+      const placeholderText = document.getElementById('placeholderText');
+      const saveButton = document.getElementById('saveButton');
+      const addGalleryButton = document.getElementById('addGalleryButton');
+      
+      loadingSpinner.style.display = 'block';
+      placeholderText.style.display = 'none';
+      saveButton.style.display = 'none';
+      addGalleryButton.style.display = 'none';
+      
+      try {
+        // Upload to blob storage
+        const imageUrl = await websim.upload(file);
+        
+        // Clear existing images
+        const existingImages = imageContainer.querySelectorAll('img');
+        existingImages.forEach(img => img.remove());
+        
+        // Create new image element
+        const uploadedImage = document.createElement('img');
+        uploadedImage.id = `generatedImage_${Date.now()}`;
+        uploadedImage.className = 'generated-image';
+        uploadedImage.style.display = 'none';
+        uploadedImage.crossOrigin = 'anonymous';
+        uploadedImage.src = imageUrl;
+        uploadedImage.alt = file.name;
+        
+        uploadedImage.onload = function() {
+          loadingSpinner.style.display = 'none';
+          uploadedImage.style.display = 'block';
+          saveButton.style.display = 'block';
+          addGalleryButton.style.display = 'block';
+          currentImage = uploadedImage;
+          
+          setupImageEditor();
+        };
+        
+        imageContainer.appendChild(uploadedImage);
+        
+        // Create initial gallery entry for uploaded image
+        const galleryEntry = await room.collection('gallery_images').create({
+          prompt: file.name,
+          title: file.name,
+          imageUrl: imageUrl,
+          views: 0,
+          uses: 0,
+          promptHistory: [{
+            prompt: `Uploaded image: ${file.name}`,
+            timestamp: new Date().toISOString(),
+            type: 'upload',
+            username: room.party.client.username
+          }]
+        });
+        
+        // Store the gallery entry ID on the image element
+        uploadedImage.dataset.galleryId = galleryEntry.id;
+        
+        // Reset the file input for future uploads
+        event.target.value = '';
+        
+      } catch (error) {
+        console.error('Error uploading image:', error);
+        loadingSpinner.style.display = 'none';
+        placeholderText.style.display = 'block';
+        alert('Failed to upload image. Please try again.');
+        
+        // Reset the file input on error
+        event.target.value = '';
+      }
+    }
+
+    async function commitText() {
+      if (!currentTextPosition || !currentImage) return;
+      
+      const canvas = document.getElementById('editCanvas');
+      const ctx = canvas.getContext('2d');
+      const text = document.getElementById('textInput').value;
+      
+      if (!text.trim()) {
+        cancelText();
+        return;
+      }
+      
+      ctx.save();
+      
+      const fontFamily = document.getElementById('fontFamily').value;
+      const fontSize = document.getElementById('fontSize').value;
+      const color = document.getElementById('textColor').value;
+      
+      // Scale the font size based on the canvas scaling
+      const scaledFontSize = fontSize * currentTextPosition.scaleX;
+      ctx.font = `${scaledFontSize}px ${fontFamily}`;
+      ctx.fillStyle = color;
+      ctx.textBaseline = 'top';
+      ctx.textAlign = 'left';  
+  
+      ctx.fillText(text, currentTextPosition.x, currentTextPosition.y);
+      
+      ctx.restore();
+      
+      originalImageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+      // If this is a newly generated image, get its ID from the dataset
+      let sourceImage;
+      if (currentImage.dataset.galleryId) {
+        sourceImage = galleryImages.find(img => img.id === currentImage.dataset.galleryId);
+      } else {
+        // Otherwise find by URL for existing gallery images
+        sourceImage = galleryImages.find(img => img.imageUrl === currentImage.src);
+      }
+      
+      if (sourceImage) {
+        // Get the base prompt history - either from the current image or create new from source
+        const basePromptHistory = galleryImages.find(img => 
+          img.imageUrl === currentImage.src
+        )?.promptHistory || [{
+          prompt: sourceImage.prompt,
+          timestamp: sourceImage.created_at,
+          username: sourceImage.username
+        }];
+        
+        // Create a fresh copy to avoid reference issues
+        const promptHistory = [...basePromptHistory];
+        
+        // Add text modification entry
+        promptHistory.push({
+          prompt: `Added text: "${text}" (${fontFamily}, ${fontSize}px, ${color})`,
+          timestamp: new Date().toISOString(),
+          type: 'text-edit',
+          username: room.party.client.username
+        });
+        
+        try {
+          // Create new modified image entry
+          const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+          const file = new File([blob], 'edited-image.png', { type: 'image/png' });
+          const imageUrl = await websim.upload(file);
+          
+          const newEntry = await room.collection('gallery_images').create({
+            prompt: sourceImage.prompt,
+            title: sourceImage.title || sourceImage.prompt,
+            imageUrl: imageUrl,
+            views: 0,
+            uses: 0,
+            modified: true,
+            promptHistory: promptHistory,
+            sourceImageId: sourceImage.id
+          });
+
+          // Update usage count of source image
+          await room.collection('gallery_images').update(sourceImage.id, {
+            uses: (sourceImage.uses || 0) + 1
+          });
+
+          // Update the current image reference and its gallery ID
+          currentImage.src = imageUrl;
+          currentImage.dataset.galleryId = newEntry.id;
+          
+        } catch (error) {
+          console.error('Error saving text edit:', error);
+          alert('Failed to save text edit. Please try again.');
+        }
+      }
+      
+      cancelText();
+    }
+
+    async function generateSelectionFill() {
+      if (!currentSelection || !currentImage) return;
+      
+      const prompt = document.getElementById('selectionPromptInput').value.trim();
+      if (!prompt) {
+        alert('Please enter a prompt for the selected region');
+        return;
+      }
+
+      const prefixSelect = document.getElementById('prefixPrompt');
+      const suffixSelect = document.getElementById('suffixPrompt');
+      const fullPrompt = `${prefixSelect.value}${prompt}${suffixSelect.value}`;
+
+      const loadingSpinner = document.getElementById('loadingSpinner');
+      loadingSpinner.style.display = 'block';
+
+      const generatedImage = document.createElement('img');
+      generatedImage.crossOrigin = 'anonymous';
+      generatedImage.style.display = 'none';
+      generatedImage.dataset.freshFill = 'true';
+      
+      generatedImage.src = fullPrompt;
+      generatedImage.alt = fullPrompt;
+
+      generatedImage.onload = async function() {
+        if (generatedImage.dataset.freshFill !== 'true') return;
+        generatedImage.dataset.freshFill = 'false';
+        
+        loadingSpinner.style.display = 'none';
+        
+        const canvas = document.getElementById('editCanvas');
+        const ctx = canvas.getContext('2d');
+
+        let minX = canvas.width;
+        let minY = canvas.height;
+        let maxX = 0;
+        let maxY = 0;
+
+        for (let y = 0; y < canvas.height; y++) {
+          for (let x = 0; x < canvas.width; x++) {
+            const pos = y * canvas.width + x;
+            if (currentSelection[pos]) {
+              minX = Math.min(minX, x);
+              minY = Math.min(minY, y);
+              maxX = Math.max(maxX, x);
+              maxY = Math.max(maxY, y);
+            }
+          }
+        }
+
+        const tempCanvas = document.createElement('canvas');
+        const tempCtx = tempCanvas.getContext('2d');
+        const selectionWidth = maxX - minX + 1;
+        const selectionHeight = maxY - minY + 1;
+        
+        tempCanvas.width = selectionWidth;
+        tempCanvas.height = selectionHeight;
+        
+        tempCtx.drawImage(generatedImage, 0, 0, selectionWidth, selectionHeight);
+        
+        const scaledImageData = tempCtx.getImageData(0, 0, selectionWidth, selectionHeight);
+        
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const pixels = imageData.data;
+
+        for (let y = minY; y <= maxY; y++) {
+          for (let x = minX; x <= maxX; x++) {
+            const pos = y * canvas.width + x;
+            if (currentSelection[pos]) {
+              const scaledX = x - minX;
+              const scaledY = y - minY;
+              const scaledPos = (scaledY * selectionWidth + scaledX) * 4;
+              const targetPos = pos * 4;
+              
+              pixels[targetPos] = scaledImageData.data[scaledPos];
+              pixels[targetPos + 1] = scaledImageData.data[scaledPos + 1];
+              pixels[targetPos + 2] = scaledImageData.data[scaledPos + 2];
+              pixels[targetPos + 3] = scaledImageData.data[scaledPos + 3];
+            }
+          }
+        }
+
+        ctx.putImageData(imageData, 0, 0);
+        originalImageData = imageData;
+
+        // If this is a newly generated image, get its ID from the dataset
+        let sourceImage;
+        if (currentImage.dataset.galleryId) {
+          sourceImage = galleryImages.find(img => img.id === currentImage.dataset.galleryId);
+        } else {
+          // Otherwise find by URL for existing gallery images
+          sourceImage = galleryImages.find(img => img.imageUrl === currentImage.src);
+        }
+        
+        if (sourceImage) {
+          try {
+            await room.collection('gallery_images').update(sourceImage.id, {
+              uses: (sourceImage.uses || 0) + 1
+            });
+            
+            // Get the base prompt history - either from the current image or create new from source
+            const basePromptHistory = galleryImages.find(img => 
+              img.imageUrl === currentImage.src
+            )?.promptHistory || [{
+              prompt: sourceImage.prompt,
+              timestamp: sourceImage.created_at,
+              username: sourceImage.username
+            }];
+            
+            // Create a fresh copy to avoid reference issues
+            const promptHistory = [...basePromptHistory];
+            
+            promptHistory.push({
+              prompt: fullPrompt,
+              timestamp: new Date().toISOString(),
+              type: 'selection-fill',
+              username: room.party.client.username
+            });
+            
+            const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+            const file = new File([blob], 'edited-image.png', { type: 'image/png' });
+            const imageUrl = await websim.upload(file);
+            
+            const newEntry = await room.collection('gallery_images').create({
+              prompt: fullPrompt,
+              title: fullPrompt,
+              imageUrl: imageUrl,
+              views: 0,
+              uses: 0,
+              modified: true,
+              promptHistory: promptHistory,
+              sourceImageId: sourceImage.id
+            });
+
+            // Update the current image reference and its gallery ID
+            currentImage.src = imageUrl;
+            currentImage.dataset.galleryId = newEntry.id;
+            
+          } catch (error) {
+            console.error('Error saving selection fill:', error);
+            alert('Failed to save selection fill. Please try again.');
+          }
+        }
+        
+        document.getElementById('fillImagePrompt').style.display = 'none';
+        generatedImage.remove();
+      };
+
+      document.body.appendChild(generatedImage);
+    }
+
+    function handleTextTool(clientX, clientY, canvasX, canvasY) {
+      const textControls = document.getElementById('textControls');
+      const canvas = document.getElementById('editCanvas');
+      const rect = canvas.getBoundingClientRect();
+      
+      // Remove existing preview
+      if (textPreview) {
+        textPreview.remove();
+      }
+      
+      // Create new preview at click position
+      textPreview = document.createElement('div');
+      textPreview.className = 'text-preview';
+      textPreview.style.position = 'fixed';
+      textPreview.style.left = `${clientX}px`;
+      textPreview.style.top = `${clientY}px`;
+
+      // Calculate scale factor between canvas display size and actual size
+      const scaleX = canvas.width / rect.width;
+      const scaleY = canvas.height / rect.height;
+
+      // Store scale factors with position
+      currentTextPosition = { 
+        x: canvasX, 
+        y: canvasY,
+        scaleX,
+        scaleY
+      };
+
+      document.body.appendChild(textPreview);
+      
+      // Position controls below preview
+      const controlsHeight = 100; 
+      const controlsWidth = 250;  
+      
+      let top = clientY + 30; 
+      let left = clientX;
+      
+      // Adjust vertical position if too close to bottom
+      if (top + controlsHeight > window.innerHeight) {
+        top = window.innerHeight - controlsHeight - 10;
+      }
+      
+      // Adjust horizontal position if too close to right edge
+      if (left + controlsWidth > window.innerWidth) {
+        left = window.innerWidth - controlsWidth - 10;
+      }
+      
+      textControls.style.display = 'flex';
+      textControls.style.left = `${left}px`;
+      textControls.style.top = `${top}px`;
+      
+      const textInput = document.getElementById('textInput');
+      textInput.focus();
+      
+      updateTextPreview();
+    }
+
+    function updateTextPreview() {
+      if (!textPreview || !currentTextPosition) return;
+      
+      const text = document.getElementById('textInput').value;
+      const fontFamily = document.getElementById('fontFamily').value;
+      const fontSize = document.getElementById('fontSize').value;
+      const color = document.getElementById('textColor').value;
+      
+      textPreview.style.fontFamily = fontFamily;
+      textPreview.style.fontSize = `${fontSize}px`;
+      textPreview.style.color = color;
+      textPreview.style.pointerEvents = 'none';
+      textPreview.textContent = text || 'Enter text...';
+    }
+
+    async function cancelText() {
+      const textControls = document.getElementById('textControls');
+      textControls.style.display = 'none';
+      document.getElementById('textInput').value = '';
+      
+      if (textPreview) {
+        textPreview.remove();
+        textPreview = null;
+      }
+      
+      currentTextPosition = null;
+    }
+
+    document.addEventListener('keydown', function (e) {
+      if (e.shiftKey) isShiftPressed = true;
+      if (e.ctrlKey) isCtrlPressed = true;
+    });
+
+    document.addEventListener('keyup', function (e) {
+      if (!e.shiftKey) isShiftPressed = false;
+      if (!e.ctrlKey) isCtrlPressed = false;
+    });
+
+    function editImage(id) {
+      const image = galleryImages.find(img => img.id === id);
+      if (!image) return;
+      currentEditId = id;
+      const dialog = document.getElementById('editPromptDialog');
+      const overlay = document.getElementById('overlay');
+      const input = document.getElementById('editPromptInput');
+      input.value = image.prompt;
+      dialog.style.display = 'block';
+      overlay.style.display = 'block';
+    }
+
+    async function saveEdit() {
+      if (!currentEditId) return;
+      
+      const input = document.getElementById('editPromptInput');
+      const newPrompt = input.value.trim();
+      
+      if (!newPrompt) {
+        alert('Please enter a prompt');
+        return;
+      }
+      
+      await room.collection('gallery_images').update(currentEditId, {
+        prompt: newPrompt
+      });
+      
+      cancelEdit();
+    }
+
+    function cancelEdit() {
+      currentEditId = null;
+      const dialog = document.getElementById('editPromptDialog');
+      const overlay = document.getElementById('overlay');
+      const input = document.getElementById('editPromptInput');
+      input.value = '';
+      dialog.style.display = 'none';
+      overlay.style.display = 'none';
+    }
+
+    async function deleteImage(id) {
+      if (!confirm('Are you sure you want to delete this image?')) return;
+      await room.collection('gallery_images').delete(id);
+    }
+
+    function filterGallery() {
+      const searchInput = document.getElementById('gallerySearch');
+      currentSearch = searchInput.value.trim();
+      renderGallery();
+    }
+
+    function renderPromptHistory(image) {
+      if (!image.promptHistory || !image.promptHistory.length) {
+        return `
+          <div class="prompt-history">
+            <div class="prompt-history-header" onclick="togglePromptHistory(this)">
+              <span>Prompt History (1)</span>
+              <svg class="expand-icon" width="12" height="12" viewBox="0 0 12 12">
+                <path fill="currentColor" d="M6 8L2 4h8z"/>
+              </svg>
+            </div>
+            <div class="prompt-history-entries" style="display: block;">
+              <div class="prompt-history-entry">
+                <div>Original prompt: ${image.prompt}</div>
+                <div class="by-user">by <span class="username-link" onclick="showUserGallery('${image.username}')">${image.username}</span></div>
+                <div class="timestamp">${new Date(image.created_at).toLocaleString()}</div>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      return `
+        <div class="prompt-history">
+          <div class="prompt-history-header" onclick="togglePromptHistory(this)">
+            <span>Prompt History (${image.promptHistory.length})</span>
+            <svg class="expand-icon" width="12" height="12" viewBox="0 0 12 12">
+              <path fill="currentColor" d="M6 8L2 4h8z"/>
+            </svg>
+          </div>
+          <div class="prompt-history-entries">
+            ${image.promptHistory.map((entry, index) => `
+              <div class="prompt-history-entry">
+                <div>
+                  ${index === 0 ? 'Original prompt: ' : 
+                    entry.type === 'selection-fill' ? 'Selection fill: ' : 
+                    entry.type === 'text-edit' ? 'Text edit: ' : 
+                    'Modified with: '}
+                  ${entry.prompt}
+                </div>
+                <div class="by-user">by <span class="username-link" onclick="showUserGallery('${entry.username || image.username}')">${entry.username || image.username}</span></div>
+                <div class="timestamp">${new Date(entry.timestamp).toLocaleString()}</div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    function togglePromptHistory(header) {
+      const historyDiv = header.parentElement;
+      historyDiv.classList.toggle('expanded');
+      const entriesDiv = historyDiv.querySelector('.prompt-history-entries');
+      if (historyDiv.classList.contains('expanded')) {
+        entriesDiv.style.display = 'block';
+      } else {
+        entriesDiv.style.display = 'none';
+      }
+    }
+
+    function showUserGallery(username) {
+      currentUserFilter = username;
+      currentPage = 1;  // Reset to first page
+      renderGallery();
+    }
+
+    function clearUserFilter() {
+      currentUserFilter = null;
+      renderGallery();
+    }
+
+    let currentEditTitleId = null;
+
+    function editTitle(id) {
+      const image = galleryImages.find(img => img.id === id);
+      
+      currentEditTitleId = id;
+      const dialog = document.getElementById('editTitleDialog');
+      const input = document.getElementById('editTitleInput');
+      input.value = image.title || image.prompt;
+      dialog.style.display = 'block';
+    }
+
+    async function saveTitleEdit() {
+      if (!currentEditTitleId) return;
+      
+      const input = document.getElementById('editTitleInput');
+      const newTitle = input.value.trim();
+      
+      if (!newTitle) {
+        alert('Please enter a title');
+        return;
+      }
+      
+      await room.collection('gallery_images').update(currentEditTitleId, {
+        title: newTitle
+      });
+      
+      cancelTitleEdit();
+    }
+
+    function cancelTitleEdit() {
+      currentEditTitleId = null;
+      const dialog = document.getElementById('editTitleDialog');
+      const input = document.getElementById('editTitleInput');
+      input.value = '';
+      dialog.style.display = 'none';
+    }
+
+    window.addEventListener('load', async () => {
+      room = new WebsimSocket();
+      await initGallery();
+      setupImageEditor();
+    });
+
+    document.getElementById('promptInput').addEventListener('keypress', function (e) {
+      if (e.key === 'Enter') {
+        generateImage();
+      }
+    });
+
+    document.getElementById('colorPicker').addEventListener('input', function (e) {
+      document.getElementById('colorPreview').style.backgroundColor = e.target.value;
+      document.getElementById('colorValue').textContent = e.target.value.toUpperCase();
+    });
+
+    document.getElementById('colorPreview').style.backgroundColor = document.getElementById('colorPicker').value;
+    document.getElementById('colorValue').textContent = document.getElementById('colorPicker').value.toUpperCase();
+
+    document.getElementById('textInput').addEventListener('input', updateTextPreview);
+    document.getElementById('fontFamily').addEventListener('change', updateTextPreview);
+    document.getElementById('fontSize').addEventListener('input', updateTextPreview);
+    document.getElementById('textColor').addEventListener('input', updateTextPreview);
+  </script>
+</body>
+</html>

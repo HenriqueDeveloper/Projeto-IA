@@ -1,0 +1,416 @@
+/* Base styles */
+:root {
+    --primary-color: #4CAF50;
+    --secondary-color: #2196F3;
+    --accent-color: #9c27b0;
+    --danger-color: #f44336;
+    --background-primary: #000000;
+    --background-secondary: #111111;
+    --text-primary: #ffffff;
+    --text-secondary: rgba(255,255,255,0.7);
+    --spacing-unit: 1rem;
+  }
+  
+  /* Layout & Typography */
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: linear-gradient(135deg, var(--background-primary), var(--background-secondary));
+    color: var(--text-primary);
+    font-family: 'Inter', Arial, sans-serif;
+    padding: var(--spacing-unit) * 2;
+  }
+  
+  .container {
+    max-width: 1200px;
+    width: 95%;
+    text-align: center;
+    padding: var(--spacing-unit);
+    margin: 0 auto;
+  }
+  
+  h1 {
+    margin-bottom: var(--spacing-unit) * 2;
+    font-size: 2.5rem;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+  }
+  
+  /* Input Controls */
+  .input-group {
+    margin-bottom: var(--spacing-unit) * 2;
+    display: flex;
+    gap: var(--spacing-unit);
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    background: rgba(255,255,255,0.05);
+    padding: var(--spacing-unit);
+    border-radius: 8px;
+  }
+  
+  input, select {
+    padding: var(--spacing-unit);
+    font-size: 1rem;
+    border: none;
+    border-radius: 5px;
+    background: rgba(255,255,255,0.1);
+    color: var(--text-primary);
+  }
+  
+  input {
+    width: 100%;
+    min-width: 200px;
+    max-width: 400px;
+  }
+  
+  select {
+    width: 100%;
+    min-width: 120px;
+    max-width: 200px;
+    cursor: pointer;
+  }
+  
+  select option {
+    background: var(--background-secondary);
+    color: var(--text-primary);
+  }
+  
+  /* Controls & Buttons */
+  .button {
+    padding: 0.8rem 1.5rem;
+    font-size: 0.9rem;
+    background: var(--primary-color);
+    border: none;
+    border-radius: 5px;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: transform 0.2s ease, background-color 0.2s ease;
+  }
+  
+  .button:hover {
+    transform: scale(1.05);
+    background: #45a049;
+  }
+  
+  /* Image Container */
+  .image-container {
+    margin-top: var(--spacing-unit) * 2;
+    padding: var(--spacing-unit);
+    background: rgba(255,255,255,0.08);
+    border-radius: 10px;
+    min-height: 300px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+  
+  .loading {
+    border: 4px solid rgba(255,255,255,0.1);
+    border-top: 4px solid var(--primary-color);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  
+  .placeholder-text {
+    color: rgba(255,255,255,0.6);
+    font-size: 1.2rem;
+  }
+  
+  .generated-image {
+    max-width: 100%;
+    max-height: 500px;
+    border-radius: 5px;
+  }
+  
+  /* Editor Controls */
+  .editor-controls {
+    margin-top: var(--spacing-unit);
+    display: flex;
+    gap: var(--spacing-unit);
+    flex-wrap: wrap;
+    justify-content: center;
+    background: rgba(255,255,255,0.05);
+    padding: var(--spacing-unit);
+    border-radius: 8px;
+  }
+  
+  .tool-group {
+    display: flex;
+    gap: 0.8rem;
+    align-items: center;
+    flex-wrap: wrap;
+    background: rgba(255,255,255,0.03);
+  }
+  
+  .tool-button {
+    padding: 0.6rem;
+    background: var(--secondary-color);
+    border: none;
+    border-radius: 5px;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .tool-button svg {
+    width: 24px;
+    height: 24px;
+    fill: currentColor;
+  }
+  
+  .tool-button:hover {
+    background: #1976D2;
+    transform: translateY(-2px);
+  }
+  
+  .tool-button.active {
+    background: #1565C0;
+    box-shadow: 0 0 10px rgba(25,118,210,0.4);
+  }
+  
+  /* Color Picker */
+  .color-display {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 10px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 5px;
+    margin-left: var(--spacing-unit);
+    flex-wrap: wrap;
+  }
+  
+  .color-preview {
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    border: 2px solid white;
+    margin-right: 8px;
+  }
+  
+  .color-value {
+    color: var(--text-primary);
+    font-family: monospace;
+  }
+  
+  /* Gallery Grid */
+  .gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: var(--spacing-unit);
+    width: 100%;
+    padding: var(--spacing-unit);
+    background: rgba(255,255,255,0.05);
+    border-radius: 8px;
+    margin-bottom: var(--spacing-unit) * 2;
+  }
+  
+  .gallery-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--spacing-unit);
+    margin-bottom: var(--spacing-unit);
+    background: rgba(255,255,255,0.05);
+  }
+  
+  .gallery-item {
+    background: rgba(255,255,255,0.08);
+    border-radius: 8px;
+    padding: var(--spacing-unit);
+    transition: transform 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .gallery-item:hover {
+    transform: translateY(-2px);
+  }
+  
+  .gallery-item img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .gallery-item-controls {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+  }
+  
+  .gallery-item-controls button {
+    padding: 0.4rem;
+    min-width: auto;
+    width: 32px;
+    height: 32px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255,255,255,0.1);
+  }
+  
+  .gallery-item-controls button:hover {
+    transform: scale(1.1);
+    background: rgba(255,255,255,0.2);
+  }
+  
+  .gallery-item-controls button svg {
+    width: 16px;
+    height: 16px;
+    fill: var(--text-primary);
+  }
+  
+  .edit-button {
+    background: var(--secondary-color) !important;
+  }
+  
+  .edit-button:hover {
+    background: #1976D2 !important;
+  }
+  
+  .delete-button {
+    background: var(--danger-color) !important;
+  }
+  
+  .delete-button:hover {
+    background: #d32f2f !important;
+  }
+  
+  /* Action Buttons */
+  .action-buttons {
+    display: flex;
+    gap: var(--spacing-unit);
+    justify-content: center;
+    margin-top: var(--spacing-unit);
+  }
+  
+  .save-button {
+    background: var(--secondary-color);
+  }
+  
+  .add-gallery-button {
+    background: var(--accent-color);
+  }
+  
+  /* Prompt History */
+  .prompt-history {
+    margin: var(--spacing-unit) 0;
+    font-size: 0.9rem;
+    color: rgba(255,255,255,0.7);
+    background: rgba(0,0,0,0.2);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  
+  .prompt-history-header {
+    padding: var(--spacing-unit) 1.2rem;
+    background: rgba(255,255,255,0.1);
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    user-select: none;
+  }
+  
+  .prompt-history-header:hover {
+    background: rgba(255,255,255,0.15);
+  }
+  
+  .prompt-history-entries {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out;
+  }
+  
+  .prompt-history.expanded .prompt-history-entries {
+    max-height: 500px;
+  }
+  
+  .prompt-history-entry {
+    padding: var(--spacing-unit) 1.2rem;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+  
+  .prompt-history-entry:last-child {
+    border-bottom: none;
+  }
+  
+  .prompt-history-entry .by-user {
+    font-size: 0.8rem;
+    color: rgba(255,255,255,0.5);
+    margin-top: 4px;
+  }
+  
+  .expand-icon {
+    transform: rotate(0deg);
+    transition: transform 0.3s ease;
+  }
+  
+  .prompt-history.expanded .expand-icon {
+    transform: rotate(180deg);
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    body {
+      padding: var(--spacing-unit);
+    }
+  
+    h1 {
+      font-size: 2rem;
+    }
+  
+    .input-group {
+      gap: 0.5rem;
+    }
+  
+    .gallery-header {
+      flex-direction: column;
+    }
+  
+    .tool-group {
+      gap: 0.5rem;
+    }
+  }
+  
+  @media (max-width: 600px) {
+    .container {
+      padding: var(--spacing-unit);
+    }
+  
+    .gallery {
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    }
+  
+    .controls-group {
+      flex-direction: column;
+    }
+  }
